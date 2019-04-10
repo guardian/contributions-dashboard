@@ -1,0 +1,25 @@
+#main {
+    display: flex;
+}
+
+#events {
+    margin-left: 20px;
+    border: 0.0625rem solid #dcdcdc;
+    width: 380px;
+}
+
+#events ul {
+    list-style-type: none;
+    padding: 5px;
+    margin: 0;
+    font-size: 13px;
+}
+
+.time {
+    font-size: 12px;
+    font-style: italic;
+}
+
+.amount {
+    font-weight: bold;
+}
