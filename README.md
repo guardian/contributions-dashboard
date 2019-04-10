@@ -1,1 +1,1 @@
-contributions-stream-ws
+contributions-dashboard
