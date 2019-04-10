@@ -5,6 +5,7 @@ version := "0.1"
 scalaVersion := "2.12.8"
 
 val circeVersion = "0.10.0"
+val sttpVersion = "1.5.12"
 
 libraryDependencies ++= Seq(
   "com.fasterxml.jackson.dataformat" % "jackson-dataformat-cbor" % "2.9.8",
@@ -16,7 +17,10 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-core" % circeVersion,
   "io.circe" %% "circe-generic" % circeVersion,
   "io.circe" %% "circe-parser" % circeVersion,
-  "com.gu" %% "fezziwig" % "0.10"
+  "com.gu" %% "fezziwig" % "0.10",
+  "com.softwaremill.sttp" %% "core" % sttpVersion,
+  "com.softwaremill.sttp" %% "circe" % sttpVersion,
+  "com.softwaremill.sttp" %% "akka-http-backend" % sttpVersion
 )
 
 sources in(Compile, doc) := Seq.empty
