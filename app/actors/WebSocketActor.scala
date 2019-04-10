@@ -29,14 +29,14 @@ case object MessageToClient {
 }
 
 object WebSocketActor {
-  def props(out: ActorRef, acquisitionTopicName: String, rankIndexTopicName: String) =
-    Props(new WebSocketActor(out, acquisitionTopicName, rankIndexTopicName))
+  def props(out: ActorRef, acquisitionTopicName: String, rankIndexTopicName: String, rankIndexActor: ActorRef) =
+    Props(new WebSocketActor(out, acquisitionTopicName, rankIndexTopicName, rankIndexActor))
 
   case object Ping
   case class RankIndexMessage(rankIndexData: List[RankIndexData])
 }
 
-class WebSocketActor(out: ActorRef, acquisitionTopicName: String, rankIndexTopicName: String) extends Actor with StrictLogging {
+class WebSocketActor(out: ActorRef, acquisitionTopicName: String, rankIndexTopicName: String, rankIndexActor: ActorRef) extends Actor with StrictLogging {
 
   logger.info("New websocket")
 
@@ -45,6 +45,10 @@ class WebSocketActor(out: ActorRef, acquisitionTopicName: String, rankIndexTopic
   mediator ! Subscribe(rankIndexTopicName, self)
 
   context.system.scheduler.schedule(30.seconds, 30.seconds, self, Ping)(context.dispatcher)
+
+  override def preStart(): Unit = {
+    rankIndexActor ! RankIndexActor.RequestRankIndexData
+  }
 
   def receive = {
     case msg: String =>

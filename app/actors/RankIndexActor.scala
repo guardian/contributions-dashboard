@@ -60,6 +60,7 @@ object RankIndexActor {
   case object RefreshRankIndexData extends Message
   case class GetHeadlines(acquisitionData: List[RawAcquisitionData]) extends Message
   case class SetRankIndexData(acquisitionData: List[RawAcquisitionData]) extends Message
+  case object RequestRankIndexData
 }
 
 class RankIndexActor(topicName: String, capiKey: String) extends Actor with StrictLogging {
@@ -116,5 +117,8 @@ class RankIndexActor(topicName: String, capiKey: String) extends Actor with Stri
     case SetRankIndexData(latest) =>
       rankIndexData = latest.map(toRankIndexData)
       mediator ! Publish(topicName, RankIndexMessage(rankIndexData))
+
+    case RequestRankIndexData =>
+      sender() ! RankIndexMessage(rankIndexData)
   }
 }

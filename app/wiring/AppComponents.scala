@@ -29,7 +29,7 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
 
   override lazy val router: Router = new Routes(
     httpErrorHandler,
-    new Application(controllerComponents, acquisitionTopicName, rankIndexTopicName)(actorSystem, materializer),
+    new Application(controllerComponents, acquisitionTopicName, rankIndexTopicName, rankIndexActor)(actorSystem, materializer),
     assets
   )
 }
