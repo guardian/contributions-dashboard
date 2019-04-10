@@ -5,11 +5,28 @@ import akka.actor._
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.Subscribe
 import com.typesafe.scalalogging.StrictLogging
+import io.circe.Encoder
 import models.RankIndexData
 import ophan.thrift.event.Acquisition
-import utils.JsonSerializer
 
 import scala.concurrent.duration._
+
+case class MessageToClient[T : Encoder](messageType: String, payload: Option[T] = None)
+
+case object MessageToClient {
+  import io.circe.generic.auto._
+  import io.circe.syntax._
+  import ophan.thrift.event.Acquisition
+  import com.gu.fezziwig.CirceScroogeMacros._
+  import models.RankIndexData
+
+  def ping = serialize(MessageToClient[Unit]("ping"))
+  def echo(payload: String) = serialize(MessageToClient[String]("echo", Some(payload)))
+  def acquisition(payload: Acquisition) = serialize(MessageToClient[Acquisition]("acquisition", Some(payload)))
+  def rankIndex(payload: List[RankIndexData]) = serialize(MessageToClient[List[RankIndexData]]("rankIndex", Some(payload)))
+
+  private def serialize[T : Encoder](message: MessageToClient[T]): String = message.asJson.noSpaces
+}
 
 object WebSocketActor {
   def props(out: ActorRef, acquisitionTopicName: String, rankIndexTopicName: String) =
@@ -31,16 +48,16 @@ class WebSocketActor(out: ActorRef, acquisitionTopicName: String, rankIndexTopic
 
   def receive = {
     case msg: String =>
-      out ! s"""{"echo": "$msg"}"""
+      out ! MessageToClient.echo(msg)
 
     case acquisition: Acquisition =>
-      out ! JsonSerializer(acquisition)
+      out ! MessageToClient.acquisition(acquisition)
 
     case RankIndexMessage(rankIndexData) =>
-      out ! JsonSerializer(rankIndexData)
+      out ! MessageToClient.rankIndex(rankIndexData)
 
     case Ping =>
-      out ! s"""{"ping": true}"""
+      out ! MessageToClient.ping
   }
 
   override def postStop() = {
