@@ -85,7 +85,11 @@ const updateTopPerforming = () => {
                     return getHeadline(content.url).then(headline => {
                         return {
                             url: headline,
-                            av: content.annualisedValueInGBP.toFixed(2)
+                            av: content.annualisedValueInGBP.toFixed(2),
+                            acquisitions: content.acquisitions,
+                            pageviews: content.pageviews,
+                            avPer1000: (content.annualisedValueInGBP / (content.pageviews / 1000)).toFixed(2),
+                            acquisitionsPer1000: (content.acquisitions / (content.pageviews / 1000)).toFixed(2),
                         }
                     });
                 })
@@ -95,11 +99,20 @@ const updateTopPerforming = () => {
 };
 
 const setTopPerforming = (topPerforming) => {
-    const list = $('#top-content ol');
+    const list = $('#top-content tbody');
     list.empty();
 
     topPerforming
-        .forEach(content => list.append(`<li><span class="av">£${content.av} AV</span> - ${content.url}</li>`));
+        .forEach(content => list.append(`
+          <tr>
+            <td>${content.url}</td>
+            <td>${content.av}</td>
+            <td>${content.acquisitions}</td>
+            <td>${content.pageviews}</td>
+            <td>${content.avPer1000}</td>
+            <td>${content.acquisitionsPer1000}</td>
+          </tr>
+      `));
 };
 
 window.onload = () => {

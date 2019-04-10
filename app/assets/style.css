@@ -20,13 +20,15 @@
     border: 0.0625rem solid #dcdcdc;
 }
 
-#top-content ol {
+#top-content ol,
+#top-content table {
     padding-left: 22px;
     margin: 0;
     font-size: 13px;
 }
 
-#top-content ol li {
+#top-content ol li,
+#top-content table tr {
     padding: 5px;
 }
 
