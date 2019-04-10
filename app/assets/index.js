@@ -53,9 +53,61 @@ const expireContributions = () => {
     });
 };
 
+const getHeadline = (urlString) => {
+    const url = new URL(urlString);
+    if (url.pathname.split('/').length > 2) {
+        return fetch(`https://content.guardianapis.com${url.pathname}?api-key=test&show-fields=headline`)
+            .then(response => response.json())
+            .then(json => {
+                if (json.response && json.response.content && json.response.content.fields && json.response.content.fields.headline) {
+                    return json.response.content.fields.headline
+                } else {
+                    return url.pathname;
+                }
+            })
+            .catch(err => {
+                console.log(err)
+                return url.pathname;
+            })
+    } else {
+        return Promise.resolve(url.pathname);
+    }
+};
+
+const updateTopPerforming = () => {
+    fetch('https://what-if-streaming-was-a-reality.ophan.co.uk/contributions')
+        .then(result => result.json())
+        .then(contentArray => contentArray.slice(0,10).filter(content => content.url.includes('theguardian.com')))
+        .then(contentArray => {
+            //if content, get headline from capi
+            return Promise.all(
+                contentArray.map(content => {
+                    return getHeadline(content.url).then(headline => {
+                        return {
+                            url: headline,
+                            av: content.annualisedValueInGBP.toFixed(2)
+                        }
+                    });
+                })
+            );
+        })
+        .then(setTopPerforming)
+};
+
+const setTopPerforming = (topPerforming) => {
+    const list = $('#top-content ol');
+    list.empty();
+
+    topPerforming
+        .forEach(content => list.append(`<li><span class="av">£${content.av} AV</span> - ${content.url}</li>`));
+};
+
 window.onload = () => {
 
     window.setInterval(expireContributions, 10000);
+
+    updateTopPerforming();
+    window.setInterval(updateTopPerforming, 10000);
 
     $('#world-map').vectorMap({
         map: 'world_en',

@@ -2,10 +2,32 @@
     display: flex;
 }
 
-#events {
-    margin-left: 20px;
-    border: 0.0625rem solid #dcdcdc;
+#top-content, #events {
     width: 380px;
+}
+
+.heading {
+    margin: 10px 5px;
+}
+
+#top-content {
+    border: 0.0625rem solid #dcdcdc;
+    margin-right: 20px;
+}
+
+#latest-contributions {
+    display: flex;
+    border: 0.0625rem solid #dcdcdc;
+}
+
+#top-content ol {
+    padding-left: 22px;
+    margin: 0;
+    font-size: 13px;
+}
+
+#top-content ol li {
+    padding: 5px;
 }
 
 #events ul {
@@ -20,6 +42,6 @@
     font-style: italic;
 }
 
-.amount {
+.amount, .av {
     font-weight: bold;
 }
