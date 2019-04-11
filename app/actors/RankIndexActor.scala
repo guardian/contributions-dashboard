@@ -47,11 +47,8 @@ object RawAcquisitionData {
 }
 
 object RankIndexActor {
-  def props(topicName: String, capiKey: String) = Props(new RankIndexActor(topicName, capiKey))
+  def props(topicName: String, capiKey: String, acquisitionDataApiUrl: String) = Props(new RankIndexActor(topicName, capiKey, acquisitionDataApiUrl))
 
-  val acquisitionDataApiUrl = Uri {
-    new java.net.URI("https://what-if-streaming-was-a-reality.ophan.co.uk/contributions")
-  }
   val capiHostUrl = (path: String, capiKey: String) => Uri {
     new java.net.URI(s"https://content.guardianapis.com/$path?show-fields=headline&api-key=$capiKey")
   }
@@ -60,10 +57,10 @@ object RankIndexActor {
   case object RefreshRankIndexData extends Message
   case class GetHeadlines(acquisitionData: List[RawAcquisitionData]) extends Message
   case class SetRankIndexData(acquisitionData: List[RawAcquisitionData]) extends Message
-  case object RequestRankIndexData
+  case object RequestRankIndexData extends Message
 }
 
-class RankIndexActor(topicName: String, capiKey: String) extends Actor with StrictLogging {
+class RankIndexActor(topicName: String, capiKey: String, acquisitionDataApiUrl: String) extends Actor with StrictLogging {
 
   private implicit val sttpHandler = AkkaHttpBackend.usingActorSystem(context.system)
 
@@ -76,7 +73,7 @@ class RankIndexActor(topicName: String, capiKey: String) extends Actor with Stri
   def receive = {
     case RefreshRankIndexData =>
       sttp
-        .get(acquisitionDataApiUrl)
+        .get(Uri(new java.net.URI(acquisitionDataApiUrl)))
         .response(asJson[List[RawAcquisitionData]])
         .send
         .foreach { response =>

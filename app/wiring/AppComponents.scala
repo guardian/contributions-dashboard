@@ -24,7 +24,8 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
 
   val rankIndexActor = {
     val capiKey = context.initialConfiguration.get[String]("capi.key")
-    actorSystem.actorOf(RankIndexActor.props(rankIndexTopicName, capiKey))
+    val acquisitionDataApiUrl = context.initialConfiguration.get[String]("acquisitionDataApiUrl")
+    actorSystem.actorOf(RankIndexActor.props(rankIndexTopicName, capiKey, acquisitionDataApiUrl))
   }
 
   override lazy val router: Router = new Routes(
