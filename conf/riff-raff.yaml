@@ -1,0 +1,17 @@
+stacks: [support]
+regions: [eu-west-1]
+deployments:
+  cfn:
+    type: cloud-formation
+    app: contributions-dashboard
+    parameters:
+      templatePath: cfn.yaml
+      amiTags:
+        Recipe: xenial-membership
+        AmigoStage: PROD
+      amiEncrypted: true
+  contributions-dashboard:
+    type: autoscaling
+    dependencies: [cfn]
+    parameters:
+      bucket: membership-dist
