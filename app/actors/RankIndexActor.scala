@@ -88,7 +88,8 @@ class RankIndexActor(topicName: String, capiKey: String, acquisitionDataApiUrl: 
     case GetHeadlines(newAcquisitionData) =>
       Future.sequence {
         newAcquisitionData
-          .filter(item => item.url.contains("theguardian.com"))
+          .take(20)
+          .filter(item => item.url.contains("www.theguardian.com"))
           .map { item =>
             val path = new java.net.URI(item.url).getPath
 
@@ -103,12 +104,14 @@ class RankIndexActor(topicName: String, capiKey: String, acquisitionDataApiUrl: 
                 } yield capiData.headline
               }
               .map {
-                case Left(_) => item.copy(headline = Some(path))  //Use the path - this happens for e.g. tag pages
+                case Left(_) => item.copy(headline = Some(path)) //Use the path - this happens for e.g. tag pages
                 case Right(headline) => item.copy(headline = Some(headline))
               }
           }
-      } foreach { acquisitionData: List[RawAcquisitionData] =>
+      } map { acquisitionData: List[RawAcquisitionData] =>
         self ! SetRankIndexData(acquisitionData)
+      } recover {
+        case e => println(s"Error querying capi: ${e.getMessage}")
       }
 
     case SetRankIndexData(latest) =>
